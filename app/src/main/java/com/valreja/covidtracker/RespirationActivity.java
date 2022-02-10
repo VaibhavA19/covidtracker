@@ -1,14 +1,26 @@
 package com.valreja.covidtracker;
 
-import androidx.appcompat.app.AppCompatActivity;
+import static java.lang.Math.abs;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class RespirationActivity extends AppCompatActivity {
 
@@ -16,28 +28,86 @@ public class RespirationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_respiration);
-        TextView x_accel = (TextView) findViewById(R.id.x_accel_tv);
-        TextView y_accel = (TextView) findViewById(R.id.y_accel_tv);
-        TextView z_accel = (TextView) findViewById(R.id.z_accel_tv);
 
-        SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-        SensorEventListener sel = new SensorEventListener() {
+        TextView resultTV = (TextView) findViewById(R.id.respiratoryRate);
+        Button button = (Button) findViewById(R.id.start_stop_respiration);
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
-                if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                    x_accel.setText(String.valueOf(Math.ceil(sensorEvent.values[0])));
-                    y_accel.setText(String.valueOf(Math.ceil(sensorEvent.values[1])));
-                    z_accel.setText(String.valueOf(Math.ceil(sensorEvent.values[2])));
-                    Log.d("heart","" + sensorEvent.values[2]);
+            public void onReceive(Context context, Intent intent) {
+                ArrayList<Integer> accelerationZ = intent.getIntegerArrayListExtra("accelerationZ");
+                if (accelerationZ == null){
+                    Toast.makeText(context, "received null dATA", Toast.LENGTH_SHORT).show();
+                    resultTV.setText("error recieved null fata");
+                }else{
+                    ArrayList<Integer> movingAvg = getMovingAvg(accelerationZ,10);
+                    float peaks = peakFinding(movingAvg);
+                    resultTV.setText( "" + ((peaks*60)/90));
                 }
             }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-
-            }
         };
-        Sensor accelSensor = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sm.registerListener(sel, accelSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        LocalBroadcastManager.getInstance(RespirationActivity.this).registerReceiver(broadcastReceiver, new IntentFilter("ResirationSensorData"));
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(RespirationActivity.this,RespiratoryDataCollectionService.class);
+                startService(i);
+                button.setActivated(false);
+            }
+        });
     }
+
+    private float peakFinding(ArrayList<Integer> data) {
+        int diff, prev, slope = 0, zeroCrossings = 0;
+        int j = 0;
+        prev = data.get(0);
+
+        //Get initial slope
+        while(slope == 0 && j + 1 < data.size()){
+            diff = data.get(j + 1) - data.get(j);
+            if(diff != 0){
+                slope = diff/abs(diff);
+            }
+            j++;
+        }
+
+        //Get total number of zero crossings in data curve
+        for(int i = 1; i<data.size(); i++) {
+
+            diff = data.get(i) - prev;
+            prev = data.get(i);
+
+            if(diff == 0) continue;
+
+            int currSlope = diff/abs(diff);
+
+            if(currSlope == -1* slope){
+                slope *= -1;
+                zeroCrossings++;
+            }
+        }
+
+        return zeroCrossings;
+    }
+
+    public ArrayList<Integer> getMovingAvg(ArrayList<Integer> data, int filter){
+
+        ArrayList<Integer> movingAvgArr = new ArrayList<>();
+        int movingAvg = 0;
+
+        for(int i=0; i< data.size(); i++){
+            movingAvg += data.get(i);
+            if(i+1 < filter) {
+                continue;
+            }
+            movingAvgArr.add((movingAvg)/filter);
+            movingAvg -= data.get(i+1 - filter);
+        }
+
+        return movingAvgArr;
+
+    }
+
 }
