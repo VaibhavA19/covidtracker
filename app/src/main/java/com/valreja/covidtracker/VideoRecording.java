@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -36,7 +37,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class VideoRecording extends AppCompatActivity {
-
 
     Button nextButton, startMeasuringButton;
     TextView resultTextView;
@@ -80,6 +80,7 @@ public class VideoRecording extends AppCompatActivity {
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Utils.hideProgressBar();
                 Bundle results = intent.getExtras();
                 for (int i = 0 ; i < 9 ; i++){
                     ArrayList<Integer> list = results.getIntegerArrayList("window"+i);
@@ -103,6 +104,7 @@ public class VideoRecording extends AppCompatActivity {
         startMeasuringButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Utils.showProgressBar(VideoRecording.this, "Calculating Heart Rate");
                 startMeasuringButton.setEnabled(false);
                 startCameraRecording();
             }

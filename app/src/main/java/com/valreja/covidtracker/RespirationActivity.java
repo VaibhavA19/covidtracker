@@ -47,6 +47,7 @@ public class RespirationActivity extends AppCompatActivity {
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Utils.hideProgressBar();
                 ArrayList<Integer> accelerationZ = intent.getIntegerArrayListExtra("accelerationZ");
                 if (accelerationZ == null){
                     Toast.makeText(context, "received null dATA", Toast.LENGTH_SHORT).show();
@@ -69,6 +70,7 @@ public class RespirationActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Utils.showProgressBar(RespirationActivity.this, "Calculating respiratory rate");
                 resultTV.setText("0");
                 button.setEnabled(false);
                 Intent i = new Intent(RespirationActivity.this,RespiratoryDataCollectionService.class);
