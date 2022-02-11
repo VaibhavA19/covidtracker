@@ -91,8 +91,13 @@ public class VideoRecording extends AppCompatActivity {
             }
         };
         LocalBroadcastManager.getInstance(VideoRecording.this).registerReceiver(broadcastReceiver, new IntentFilter("HeartRateBroadcast"));
-
-        startCameraRecording();
+        startMeasuringButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startMeasuringButton.setEnabled(false);
+                startCameraRecording();
+            }
+        });
     }
 
     private float peakFinding(ArrayList<Integer> data) {
