@@ -31,7 +31,13 @@ public class RespirationActivity extends AppCompatActivity {
 
         TextView resultTV = (TextView) findViewById(R.id.respiratoryRate);
         Button button = (Button) findViewById(R.id.start_stop_respiration);
+        Button nextButton = (Button)findViewById(R.id.resp_next);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+            }
+        });
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -39,11 +45,14 @@ public class RespirationActivity extends AppCompatActivity {
                 if (accelerationZ == null){
                     Toast.makeText(context, "received null dATA", Toast.LENGTH_SHORT).show();
                     resultTV.setText("error recieved null fata");
+                    nextButton.setVisibility(View.INVISIBLE);
                 }else{
+                    nextButton.setVisibility(View.VISIBLE);
                     ArrayList<Integer> movingAvg = getMovingAvg(accelerationZ,10);
                     float peaks = peakFinding(movingAvg);
                     resultTV.setText( "" + ((peaks*60)/90));
                 }
+                button.setText("RE CALCULATE");
             }
         };
         LocalBroadcastManager.getInstance(RespirationActivity.this).registerReceiver(broadcastReceiver, new IntentFilter("ResirationSensorData"));
@@ -52,9 +61,10 @@ public class RespirationActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                resultTV.setText("0");
+                button.setEnabled(false);
                 Intent i = new Intent(RespirationActivity.this,RespiratoryDataCollectionService.class);
                 startService(i);
-                button.setActivated(false);
             }
         });
     }
