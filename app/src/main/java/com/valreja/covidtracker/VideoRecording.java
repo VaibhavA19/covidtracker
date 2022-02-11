@@ -97,6 +97,7 @@ public class VideoRecording extends AppCompatActivity {
                 resultTextView.setText(heartRate+"");
                 nextButton.setVisibility(View.VISIBLE);
                 startMeasuringButton.setText("RE CALCULATE");
+                startMeasuringButton.setEnabled(true);
                 Log.d("FINAL",heartRate+"");
             }
         };
