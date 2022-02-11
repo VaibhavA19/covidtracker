@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 symptomsAdapter.notifyDataSetChanged();
                 //startActivity(new Intent(getApplicationContext(),VideoRecording.class));
+                //Intent i = new Intent(getApplicationContext(),RespirationActivity.class);
+
                 startActivity(new Intent(getApplicationContext(),RespirationActivity.class));
             }
         });

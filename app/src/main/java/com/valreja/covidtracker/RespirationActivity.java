@@ -35,7 +35,8 @@ public class RespirationActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                startActivity(new Intent(RespirationActivity.this,VideoRecording.class));
+                finish();
             }
         });
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -52,6 +53,7 @@ public class RespirationActivity extends AppCompatActivity {
                     float peaks = peakFinding(movingAvg);
                     resultTV.setText( "" + ((peaks*60)/90));
                 }
+                button.setEnabled(true);
                 button.setText("RE CALCULATE");
             }
         };

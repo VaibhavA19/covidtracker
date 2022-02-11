@@ -25,6 +25,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
@@ -35,6 +38,8 @@ import java.util.ArrayList;
 public class VideoRecording extends AppCompatActivity {
 
 
+    Button nextButton, startMeasuringButton;
+    TextView resultTextView;
     String rootPath = Environment.getExternalStorageDirectory().getPath();
     File mediaFile = new File( rootPath + "/heart_rate.mp4");
     private Uri fileUri = FileProvider.getUriForFile(VideoRecording.this,"com.valreja.fileprovider",mediaFile);
@@ -56,7 +61,9 @@ public class VideoRecording extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_recording);
-
+        startMeasuringButton = (Button) findViewById(R.id.measure_heart_button);
+        nextButton = (Button) findViewById(R.id.heart_next_button);
+        resultTextView = (TextView) findViewById(R.id.heart_rate_tv);
         if (!OpenCVLoader.initDebug()) {
             Toast.makeText(this,"OpenCV fail", Toast.LENGTH_LONG).show();
         }
@@ -77,6 +84,9 @@ public class VideoRecording extends AppCompatActivity {
                     }
                 }
                 heartRate = (heartRate*12)/ 9;
+                resultTextView.setText(heartRate+"");
+                nextButton.setVisibility(View.VISIBLE);
+                startMeasuringButton.setText("RE CALCULATE");
                 Log.d("FINAL",heartRate+"");
             }
         };
