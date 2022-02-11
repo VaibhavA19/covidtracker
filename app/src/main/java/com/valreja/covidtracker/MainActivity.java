@@ -61,17 +61,22 @@ public class MainActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                float heartRate = getIntent().getFloatExtra("HEART_RATE",0);
+                float respRate = getIntent().getFloatExtra("RESP_RATE",0);
+
                 UserDatabase userDatabase = new UserDatabase(getApplicationContext());
-                userDatabase.insertSymptoms(symptomArrayList);
+                userDatabase.insertSymptoms(symptomArrayList,heartRate,respRate);
                 for (Symptom s: symptomArrayList
                 ) {
                     s.setRating(0);
                 }
                 symptomsAdapter.notifyDataSetChanged();
+
                 //startActivity(new Intent(getApplicationContext(),VideoRecording.class));
                 //Intent i = new Intent(getApplicationContext(),RespirationActivity.class);
-
-                startActivity(new Intent(getApplicationContext(),RespirationActivity.class));
+                //startActivity(new Intent(getApplicationContext(),RespirationActivity.class));
+                Toast.makeText(MainActivity.this, "Details submitted", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

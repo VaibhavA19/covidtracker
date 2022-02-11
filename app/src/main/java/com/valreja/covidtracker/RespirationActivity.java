@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 public class RespirationActivity extends AppCompatActivity {
 
+    float resultRespRate =0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +36,11 @@ public class RespirationActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(RespirationActivity.this,VideoRecording.class));
+                Intent i = new Intent(RespirationActivity.this,MainActivity.class);
+                i.putExtra("RESP_RATE", resultRespRate);
+                float heartRate = getIntent().getFloatExtra("HEART_RATE",0);
+                i.putExtra("HEART_RATE",heartRate);
+                startActivity(i);
                 finish();
             }
         });
@@ -51,7 +56,8 @@ public class RespirationActivity extends AppCompatActivity {
                     nextButton.setVisibility(View.VISIBLE);
                     ArrayList<Integer> movingAvg = getMovingAvg(accelerationZ,10);
                     float peaks = peakFinding(movingAvg);
-                    resultTV.setText( "" + ((peaks*60)/90));
+                    resultRespRate = ((peaks*60)/90);
+                    resultTV.setText( "" + resultRespRate);
                 }
                 button.setEnabled(true);
                 button.setText("RE CALCULATE");

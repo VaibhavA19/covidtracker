@@ -1,7 +1,7 @@
 package com.valreja.covidtracker.DataBase;
 
 public class DBConstants {
-    public static String TABLE_NAME = "userdata";
+    public static String TABLE_NAME = "vaibhav";
 
     public static String COLUMN_ID = "id";
     public static String COLUMN_HEART_RATE = "heart";
@@ -17,7 +17,7 @@ public class DBConstants {
     public static String COLUMN_SHORT_BREATH_RATING = "breath";
     public static String COLUMN_TIRED_RATING = "tired";
 
-    public static String CREATE = " CREATE TABLE ";
+    public static String CREATE = " CREATE TABLE IF NOT EXISTS ";
     public static String COMMA = " , ";
     public static String LBR = " ( ";
     public static String RBR = " ) ";

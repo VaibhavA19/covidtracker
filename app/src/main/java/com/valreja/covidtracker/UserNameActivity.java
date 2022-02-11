@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.valreja.covidtracker.DataBase.DBConstants;
+
 public class UserNameActivity extends AppCompatActivity {
 
     @Override
@@ -21,10 +23,12 @@ public class UserNameActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String userName = userNameEditText.getText().toString();
+                userNameEditText.setText("");
                 Toast.makeText(UserNameActivity.this, "Welcome "+ userName, Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(UserNameActivity.this,MainActivity.class);
-                i.putExtra("USER_NAME",userName);
+                DBConstants.TABLE_NAME = userName;
+                Intent i = new Intent(UserNameActivity.this,VideoRecording.class);
                 startActivity(i);
+
             }
         });
     }

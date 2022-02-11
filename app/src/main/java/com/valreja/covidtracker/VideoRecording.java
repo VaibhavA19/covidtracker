@@ -40,6 +40,7 @@ public class VideoRecording extends AppCompatActivity {
 
     Button nextButton, startMeasuringButton;
     TextView resultTextView;
+    float heartRate = 0 ;
     String rootPath = Environment.getExternalStorageDirectory().getPath();
     File mediaFile = new File( rootPath + "/heart_rate.mp4");
     private Uri fileUri = FileProvider.getUriForFile(VideoRecording.this,"com.valreja.fileprovider",mediaFile);
@@ -67,11 +68,19 @@ public class VideoRecording extends AppCompatActivity {
         if (!OpenCVLoader.initDebug()) {
             Toast.makeText(this,"OpenCV fail", Toast.LENGTH_LONG).show();
         }
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(VideoRecording.this,RespirationActivity.class);
+                i.putExtra("HEART_RATE", heartRate);
+                startActivity(i);
+                finish();
+            }
+        });
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Bundle results = intent.getExtras();
-                float heartRate = 0 ;
                 for (int i = 0 ; i < 9 ; i++){
                     ArrayList<Integer> list = results.getIntegerArrayList("window"+i);
                     if(list != null) {
