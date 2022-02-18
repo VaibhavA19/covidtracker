@@ -35,6 +35,7 @@ import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class VideoRecording extends AppCompatActivity {
 
@@ -86,9 +87,9 @@ public class VideoRecording extends AppCompatActivity {
                     ArrayList<Integer> list = results.getIntegerArrayList("window"+i);
                     if(list != null) {
                         Log.d("HEART_SERVICE", "RESULT " + i + list.toString());
-                        ArrayList<Integer> movigAvgArr = getMovingAvg(list,5);
-                        float zeroCrossings = peakFinding(movigAvgArr);
-                        heartRate += zeroCrossings/2;
+                        ArrayList<Integer> movigAvgArr = Utils.getMovingAvg(list,5);
+                        float peaks = Utils.peakFinding(movigAvgArr);
+                        heartRate += peaks/2;
                     }else{
                         Log.d("HEART_SERVICE", "list " + i + " is null");
                     }
@@ -112,39 +113,6 @@ public class VideoRecording extends AppCompatActivity {
         });
     }
 
-    private float peakFinding(ArrayList<Integer> data) {
-        int diff, prev, slope = 0, zeroCrossings = 0;
-        int j = 0;
-        prev = data.get(0);
-
-        //Get initial slope
-        while(slope == 0 && j + 1 < data.size()){
-            diff = data.get(j + 1) - data.get(j);
-            if(diff != 0){
-                slope = diff/abs(diff);
-            }
-            j++;
-        }
-
-        //Get total number of zero crossings in data curve
-        for(int i = 1; i<data.size(); i++) {
-
-            diff = data.get(i) - prev;
-            prev = data.get(i);
-
-            if(diff == 0) continue;
-
-            int currSlope = diff/abs(diff);
-
-            if(currSlope == -1* slope){
-                slope *= -1;
-                zeroCrossings++;
-            }
-        }
-
-        return zeroCrossings;
-    }
-
 
     private void startCameraRecording(){
 
@@ -163,29 +131,22 @@ public class VideoRecording extends AppCompatActivity {
             if(resultCode == RESULT_OK){
                 Uri vid = data.getData();
                 String s  = getRealPathFromURI(vid);
+                MediaPlayer mediaPlayer = MediaPlayer.create(this, Uri.parse(s));
+                int duration = mediaPlayer.getDuration();
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
+                if (seconds < 45){
+                    Toast.makeText(this, "Please record for 45 seconds", Toast.LENGTH_SHORT).show();
+                    startMeasuringButton.setEnabled(true);
+                    Utils.hideProgressBar();
+                    return;
+                }
                 Log.d("SAVE",s);
                 savedFilePath = s;
                 readVideoFile();
+            }else{
+                Utils.hideProgressBar();
             }
         }
-    }
-
-    public ArrayList<Integer> getMovingAvg(ArrayList<Integer> data, int filter){
-
-        ArrayList<Integer> movingAvgArr = new ArrayList<>();
-        int movingAvg = 0;
-
-        for(int i=0; i< data.size(); i++){
-            movingAvg += data.get(i);
-            if(i+1 < filter) {
-                continue;
-            }
-            movingAvgArr.add((movingAvg)/filter);
-            movingAvg -= data.get(i+1 - filter);
-        }
-
-        return movingAvgArr;
-
     }
 
     public String getRealPathFromURI(Uri contentUri) {

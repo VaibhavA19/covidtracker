@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int id, float newRating) {
                 symptomArrayList.get(id).setRating(newRating);
-                Toast.makeText(MainActivity.this, symptomArrayList.get(id).getName() + ": " + symptomArrayList.get(id).getRating(), Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(MainActivity.this, symptomArrayList.get(id).getName() + ": " + symptomArrayList.get(id).getRating(), Toast.LENGTH_SHORT).show();
             }
         });
         Log.d("AAAAAAAAAAAAAAA"," in gomeeeeeeeeee fragment");

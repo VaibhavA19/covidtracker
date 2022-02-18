@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:text="Heart Rate\n Beats/minute"
+        android:text="Heart Rate\n Beats/minute\n Place finger on camera\n with flash on after pressing start"
         android:gravity="center_horizontal|center_vertical"
-        android:textSize="50sp"
+        android:textSize="20sp"
        />
     <TextView
         android:text="0"
