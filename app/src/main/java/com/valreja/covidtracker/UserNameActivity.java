@@ -17,28 +17,87 @@ import android.widget.Toast;
 
 import com.valreja.covidtracker.DataBase.DBConstants;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class UserNameActivity extends AppCompatActivity {
 
     String[] permissionsArray;
+    Long milliSecond ;
+    UserManagementHelper userManagementHelper;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_name);
+        userManagementHelper = new UserManagementHelper(UserNameActivity.this);
+        Utils.writeToFile(this,"test/dummyfile","Dummy Dummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentcontentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy content");
+        Toast.makeText(this, Utils.readFile(this, "test/dummyfile"), Toast.LENGTH_SHORT).show();
+        milliSecond = System.currentTimeMillis();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uploadImage();
+        }
         permissionsArray = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
         requestAllPermissions();
         EditText userNameEditText = (EditText) findViewById(R.id.user_name_edit_text);
+        EditText passwordEditText = (EditText)findViewById(R.id.password_edit_text);
         Button submitUserNameButton = (Button) findViewById(R.id.submit_user_name);
         submitUserNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                boolean userAuthenticated = false;
                 String userName = userNameEditText.getText().toString();
-                userNameEditText.setText("");
-                Toast.makeText(UserNameActivity.this, "Welcome "+ userName, Toast.LENGTH_SHORT).show();
-                DBConstants.TABLE_NAME = userName;
-                Intent i = new Intent(UserNameActivity.this,VideoRecording.class);
-                startActivity(i);
-
+                String password = passwordEditText.getText().toString();
+                User currentUser = new User(userName,password);
+                if(userManagementHelper.anyUserRegistered()) {
+                    if(userManagementHelper.userExists(currentUser)){
+                        userAuthenticated = true;
+                    }else{
+                        userNameEditText.setText("");
+                        passwordEditText.setText("");
+                        Toast.makeText(UserNameActivity.this, "Incorrect username password", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    userManagementHelper.addUser(currentUser);
+                    userAuthenticated = true;
+                    Toast.makeText(UserNameActivity.this, "User registered", Toast.LENGTH_SHORT).show();
+                }
+                if (userAuthenticated){
+                    Toast.makeText(UserNameActivity.this, "Welcome "+ userName, Toast.LENGTH_SHORT).show();
+                    DBConstants.TABLE_NAME = userName;
+                    Intent i = new Intent(UserNameActivity.this,VideoRecording.class);
+                    startActivity(i);
+                }
+            }
+        });
+        ((Button)findViewById(R.id.start_f_service)).setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(UserNameActivity.this,LocationService.class);
+                startForegroundService(i);
+            }
+        });
+        ((Button)findViewById(R.id.stop_f_service)).setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(UserNameActivity.this,LocationService.class);
+                i.setAction(Utils.ACTION_STOP_FOREGROUND);
+                startForegroundService(i);
             }
         });
     }
@@ -69,5 +128,40 @@ public class UserNameActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void uploadImage(){
+        InputStream ins = getResources().openRawResource(
+                getResources().getIdentifier("image",
+                        "raw", getPackageName()));
+        String result = new BufferedReader(new InputStreamReader(ins))
+                .lines().collect(Collectors.joining(""));
+        Utils.writeToFile(UserNameActivity.this,"test/image.jpg",result);
+        File imageFile = new File(UserNameActivity.this.getFilesDir()+"/test/image.jpg");
+        //File imageFile = new File(uri.getPath());
+        RequestBody reqBody = RequestBody.create(MediaType.parse("multipart/form-file"), imageFile);
+        MultipartBody.Part partImage = MultipartBody.Part.createFormData("file", imageFile.getName(), reqBody);
+        API api = RetrofitClient.getInstance().getAPI();
+        Call<ResponseBody> upload = api.uploadImage(partImage);
+        upload.enqueue(new Callback<ResponseBody>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()) {
+                    Long duration = System.currentTimeMillis() - milliSecond;
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                    LocalDateTime now = LocalDateTime.now();
+                    String timeStamp = dtf.format(now);
+                    Utils.appendToFile(UserNameActivity.this,"test/connection", timeStamp + ";"  + (imageFile.length()/((1.0*duration)/1000)) + "B/s");
+                    Toast.makeText(UserNameActivity.this, "Image Uploaded in " + duration +" size " + imageFile.length(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                Toast.makeText(UserNameActivity.this, "Request failed"+t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -4,11 +4,74 @@ import static java.lang.Math.abs;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Utils {
     private static ProgressDialog progress;
+    public static final String ACTION_STOP_FOREGROUND = BuildConfig.APPLICATION_ID + ".stop" ;
+
+
+    public static void writeToFile(Context context, String relative_path, String text){
+        File file = new File(context.getFilesDir() + "/" + relative_path);
+        Toast.makeText(context, file.toString(), Toast.LENGTH_LONG).show();
+        File path = new File(file.getParent());
+        Toast.makeText(context, path.toString(), Toast.LENGTH_LONG).show();
+        if (path != null)
+            if (!path.exists()){
+                Log.d("FILETRY","creating dir");
+            }else{
+                Log.d("FILETRY","not creating dir");
+            }
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.append(text);
+            fileWriter.flush();
+            fileWriter.close();
+            Log.d("FILETRY", "filewritten");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("FILETRY","creating dir" + e.toString());
+        }
+    }
+    public static String readFile(Context context, String relative_path){
+        File file = new File(context.getFilesDir() + "/" + relative_path);
+        if (!file.exists()) return "";
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (BufferedReader br
+                     = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultStringBuilder.toString();
+    }
+
+    public static void appendToFile(Context context, String file, String text){
+        String currentFileText = readFile(context,file);
+        writeToFile(context,file,currentFileText+ text);
+    }
+
     public static void showProgressBar(Context context, String message){
         progress = new ProgressDialog(context);
         progress.setTitle("");
