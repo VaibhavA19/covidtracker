@@ -27,12 +27,20 @@ import com.valreja.covidtracker.DataBase.UserDatabase;
 
 import org.json.JSONArray;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.stream.Collectors;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,9 +49,11 @@ import retrofit2.Response;
 public class LocationService extends Service implements LocationListener {
     PowerManager pm;
     PowerManager.WakeLock wl;
+    Long milliSecond;
 
     Handler handler = new Handler();
     private Runnable periodicUpdate = new Runnable() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void run() {
             handler.postDelayed(periodicUpdate, 15*60*1000 - SystemClock.elapsedRealtime()%1000);
@@ -65,6 +75,9 @@ public class LocationService extends Service implements LocationListener {
             }else{
                 Utils.appendToFile(getApplicationContext(),"test/newtest","cannot get location"+ Calendar.getInstance().getTime().toString());
             }
+
+            milliSecond = System.currentTimeMillis();
+            uploadImage();
         }
     };
 
@@ -149,5 +162,41 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void uploadImage(){
+        InputStream ins = getResources().openRawResource(
+                getResources().getIdentifier("image",
+                        "raw", getPackageName()));
+        String result = new BufferedReader(new InputStreamReader(ins))
+                .lines().collect(Collectors.joining(""));
+        Utils.writeToFile(getApplicationContext(),"test/image.jpg",result);
+        File imageFile = new File(getApplicationContext().getFilesDir()+"/test/image.jpg");
+        //File imageFile = new File(uri.getPath());
+        RequestBody reqBody = RequestBody.create(MediaType.parse("multipart/form-file"), imageFile);
+        MultipartBody.Part partImage = MultipartBody.Part.createFormData("file", imageFile.getName(), reqBody);
+        API api = RetrofitClient.getInstance().getAPI();
+        Call<ResponseBody> upload = api.uploadImage(partImage);
+        upload.enqueue(new Callback<ResponseBody>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()) {
+                    Long duration = System.currentTimeMillis() - milliSecond;
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                    LocalDateTime now = LocalDateTime.now();
+                    String timeStamp = dtf.format(now);
+                    Utils.appendToFile(getApplicationContext(),"test/connection", timeStamp + ";"  + (imageFile.length()/((1.0*duration)/1000)) + "B/s");
+                    Toast.makeText(getApplicationContext(), "Image Uploaded in " + duration +" size " + imageFile.length(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                Toast.makeText(getApplicationContext(), "Request failed"+t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

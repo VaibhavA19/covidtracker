@@ -25,11 +25,13 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     String[] permissionsArray;
+    LocationHelper locationHelper;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        locationHelper = new LocationHelper(getApplicationContext());
 
         permissionsArray = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
         requestAllPermissions();
@@ -55,8 +57,10 @@ public class MainActivity extends AppCompatActivity {
                 float respRate = getIntent().getFloatExtra("RESP_RATE",0);
 
                 UserDatabase userDatabase = new UserDatabase(getApplicationContext());
-                LocationHelper locationHelper = new LocationHelper(getApplicationContext());
-                userDatabase.insertSymptoms(symptomArrayList,heartRate,respRate,locationHelper.getLatitude(),locationHelper.getLongitude());
+
+                if (locationHelper.canGetLocation()) {
+                    userDatabase.insertSymptoms(symptomArrayList, heartRate, respRate, locationHelper.getLatitude(), locationHelper.getLongitude());
+                }
                 for (Symptom s: symptomArrayList
                 ) {
                     s.setRating(0);
