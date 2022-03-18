@@ -7,6 +7,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.valreja.covidtracker.DataBase.DBConstants;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,6 +74,21 @@ public class Utils {
         writeToFile(context,file,currentFileText+ text);
     }
 
+    public static ArrayList<Symptom> getSymptomsArrayList(){
+        ArrayList<Symptom> symptomArrayList = new ArrayList<Symptom>();
+        symptomArrayList.add(new Symptom("Nausea",0, DBConstants.COLUMN_NAUSEA_RATING));
+        symptomArrayList.add(new Symptom("Headache",0, DBConstants.COLUMN_HEADACHE_RATING));
+        symptomArrayList.add(new Symptom("diarrhea",0, DBConstants.COLUMN_DIARRHEA_RATING));
+        symptomArrayList.add(new Symptom("Soar Throat",0, DBConstants.COLUMN_SOAR_THROAT_RATING));
+        symptomArrayList.add(new Symptom("Fever",0, DBConstants.COLUMN_FEVER_RATING));
+        symptomArrayList.add(new Symptom("Muscle Pain",0, DBConstants.COLUMN_MUSCLE_ACHE_RATING));
+        symptomArrayList.add(new Symptom("Loss of Smell or Taste",0, DBConstants.COLUMN_LOSS_OF_TASTE_SMELL_RATING));
+        symptomArrayList.add(new Symptom("Cough",0, DBConstants.COLUMN_COUGH_RATING));
+        symptomArrayList.add(new Symptom("Shortness of Breath",0, DBConstants.COLUMN_SHORT_BREATH_RATING));
+        symptomArrayList.add(new Symptom("Feeling Tired",0, DBConstants.COLUMN_TIRED_RATING));
+        return symptomArrayList;
+
+    }
     public static void showProgressBar(Context context, String message){
         progress = new ProgressDialog(context);
         progress.setTitle("");

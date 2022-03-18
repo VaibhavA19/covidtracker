@@ -17,8 +17,8 @@ public class UserManagementHelper {
             return false;
         }
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-        sharedPreferencesEditor.putString(activity.getString(R.string.user_name),user.getUsername());
-        sharedPreferencesEditor.putString(activity.getString(R.string.password),user.getPassword());
+        sharedPreferencesEditor.putString(activity.getString(R.string.user_name), user.getUsername());
+        sharedPreferencesEditor.putString(activity.getString(R.string.password), user.getPassword());
         sharedPreferencesEditor.putBoolean(activity.getString(R.string.user_registered),true);
         sharedPreferencesEditor.apply();
         return true;
@@ -36,8 +36,12 @@ public class UserManagementHelper {
         return false;
     }
 
+    public String getUPass(){
+        String username = sharedPreferences.getString(activity.getString(R.string.user_name),"");
+        String password = sharedPreferences.getString(activity.getString(R.string.password),"");
+        return username+":"+password;
+    }
     public  boolean anyUserRegistered(){
         return sharedPreferences.getBoolean(activity.getString(R.string.user_registered),false);
     }
-
 }

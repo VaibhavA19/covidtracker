@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -43,6 +45,9 @@ public class UserNameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_name);
+        registerAlarm();
+        String temp = (new UserManagementHelper(UserNameActivity.this)).getUPass();
+        Toast.makeText(this, temp, Toast.LENGTH_SHORT).show();
         userManagementHelper = new UserManagementHelper(UserNameActivity.this);
         Utils.writeToFile(this,"test/dummyfile","Dummy Dummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentcontentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy contentDummy content");
         Toast.makeText(this, Utils.readFile(this, "test/dummyfile"), Toast.LENGTH_SHORT).show();
@@ -50,7 +55,8 @@ public class UserNameActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             uploadImage();
         }
-        permissionsArray = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        permissionsArray = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
         requestAllPermissions();
         EditText userNameEditText = (EditText) findViewById(R.id.user_name_edit_text);
         EditText passwordEditText = (EditText)findViewById(R.id.password_edit_text);
@@ -100,6 +106,13 @@ public class UserNameActivity extends AppCompatActivity {
                 startForegroundService(i);
             }
         });
+    }
+
+    public void registerAlarm(){
+        Intent i = new Intent(this, ConnectionTestBroadcastReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(this.getApplicationContext(), 234324243, i, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pi);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
