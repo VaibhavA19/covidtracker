@@ -89,7 +89,7 @@ public class UserNameActivity extends AppCompatActivity {
                 passwordEditText.setText("");
             }
         });
-        /*((Button)findViewById(R.id.start_f_service)).setOnClickListener(new View.OnClickListener() {
+        ((Button)findViewById(R.id.start_f_service)).setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
@@ -105,7 +105,7 @@ public class UserNameActivity extends AppCompatActivity {
                 i.setAction(Utils.ACTION_STOP_FOREGROUND);
                 startForegroundService(i);
             }
-        });*/
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
