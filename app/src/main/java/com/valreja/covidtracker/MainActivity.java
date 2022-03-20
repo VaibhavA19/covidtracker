@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.valreja.covidtracker.DataBase.DBConstants;
+import com.valreja.covidtracker.DataBase.DBHelper;
 import com.valreja.covidtracker.DataBase.UserDatabase;
 
 import java.util.ArrayList;
@@ -57,9 +58,11 @@ public class MainActivity extends AppCompatActivity {
                 float respRate = getIntent().getFloatExtra("RESP_RATE",0);
 
                 UserDatabase userDatabase = new UserDatabase(getApplicationContext());
+                DBHelper encryptedDB = new DBHelper(MainActivity.this);
 
                 if (locationHelper.canGetLocation()) {
                     userDatabase.insertSymptoms(symptomArrayList, heartRate, respRate, locationHelper.getLatitude(), locationHelper.getLongitude());
+                    encryptedDB.insertSymptoms(symptomArrayList, heartRate, respRate, locationHelper.getLatitude(), locationHelper.getLongitude());
                 }
                 for (Symptom s: symptomArrayList
                 ) {

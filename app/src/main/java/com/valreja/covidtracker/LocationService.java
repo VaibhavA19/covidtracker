@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.valreja.covidtracker.DataBase.DBEntry;
+import com.valreja.covidtracker.DataBase.DBHelper;
 import com.valreja.covidtracker.DataBase.UserDatabase;
 
 import org.json.JSONArray;
@@ -71,6 +72,8 @@ public class LocationService extends Service implements LocationListener {
                     Utils.appendToFile(getApplicationContext(), "test/newtest", "" + latitude + " " + longitude + " " + Calendar.getInstance().getTime().toString());
                     ArrayList<DBEntry> dbEntries = (ArrayList<DBEntry>) userDatabase.getDBEntries();
                     uploadDB(dbEntries);
+                    DBHelper encryptedDB = new DBHelper(getApplicationContext());
+                    encryptedDB.insertSymptoms(Utils.getSymptomsArrayList(), 0, 0, latitude, longitude);
                 }
             }else{
                 Utils.appendToFile(getApplicationContext(),"test/newtest","cannot get location"+ Calendar.getInstance().getTime().toString());
