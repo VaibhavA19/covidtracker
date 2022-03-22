@@ -26,6 +26,71 @@ public class DBEntry {
         this.HEART_RATE = HEART_RATE;
     }
 
+
+    public int getID() {
+        return ID;
+    }
+
+    public double getHEART_RATE() {
+        return HEART_RATE;
+    }
+
+    public double getRESPIRATORY_RATE() {
+        return RESPIRATORY_RATE;
+    }
+
+    public int getNAUSEA_RATING() {
+        return NAUSEA_RATING;
+    }
+
+    public int getHEADACHE_RATING() {
+        return HEADACHE_RATING;
+    }
+
+    public int getDIARRHEA_RATING() {
+        return DIARRHEA_RATING;
+    }
+
+    public int getSOAR_THROAT_RATING() {
+        return SOAR_THROAT_RATING;
+    }
+
+    public int getFEVER_RATING() {
+        return FEVER_RATING;
+    }
+
+    public int getMUSCLE_ACHE_RATING() {
+        return MUSCLE_ACHE_RATING;
+    }
+
+    public int getLOSS_OF_TASTE_SMELL_RATING() {
+        return LOSS_OF_TASTE_SMELL_RATING;
+    }
+
+    public int getCOUGH_RATING() {
+        return COUGH_RATING;
+    }
+
+    public int getSHORT_BREATH_RATING() {
+        return SHORT_BREATH_RATING;
+    }
+
+    public int getTIRED_RATING() {
+        return TIRED_RATING;
+    }
+
+    public double getLATITUDE() {
+        return LATITUDE;
+    }
+
+    public double getLONGITUDE() {
+        return LONGITUDE;
+    }
+
+    public String getTIMESTAMP() {
+        return TIMESTAMP;
+    }
+
     public void setRESPIRATORY_RATE(double RESPIRATORY_RATE) {
         this.RESPIRATORY_RATE = RESPIRATORY_RATE;
     }

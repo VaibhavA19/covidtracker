@@ -3,7 +3,7 @@
     <string name="user_name">user_name</string>
     <string name="password">u_pass</string>
     <string name="user_registered">u_reg</string>
-    <string name="privacy_notice">By clicking START you agree to your \nlocation being tracked every 15 mins</string>
+    <string name="privacy_notice">By clicking START COLLECTING you agree to your \nlocation being tracked every 15 mins</string>
     <string name="start">start</string>
     <string name="cancel">cancel</string>
     <string name="user_agreed">user_agreed</string>

@@ -35,6 +35,9 @@ public class UserManagementHelper {
         }
         return false;
     }
+    public String getPassword(){
+        return sharedPreferences.getString(activity.getString(R.string.password),"");
+    }
 
     public boolean userPrivacyAgreement(){
         return sharedPreferences.getBoolean("user_agreed",false);

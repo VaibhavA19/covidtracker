@@ -20,6 +20,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.valreja.covidtracker.DataBase.DBConstants;
+import com.valreja.covidtracker.DataBase.DBEntry;
+import com.valreja.covidtracker.DataBase.DBHelper;
+import com.valreja.covidtracker.DataBase.UserDatabase;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import okhttp3.MediaType;
@@ -47,8 +51,33 @@ public class UserNameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_name);
-        showPrivacyDialog();
         userManagementHelper = new UserManagementHelper(UserNameActivity.this);
+        userManagementHelper.setPrivacyAgreement(false);
+        /*UserDatabase userDatabase = new UserDatabase(UserNameActivity.this);
+        ArrayList<DBEntry> dbEntries = (ArrayList<DBEntry>) userDatabase.getDBEntries();
+        DBHelper encryptedDB = new DBHelper(UserNameActivity.this);
+        for (DBEntry dbentry: dbEntries) {
+            ArrayList<Symptom> arrayList = Utils.getSymptomsArrayList();
+            arrayList.get(0).setRating(dbentry.getNAUSEA_RATING());
+            arrayList.get(1).setRating(dbentry.getHEADACHE_RATING());
+            arrayList.get(2).setRating(dbentry.getDIARRHEA_RATING());
+            arrayList.get(3).setRating(dbentry.getSOAR_THROAT_RATING());
+            arrayList.get(4).setRating(dbentry.getFEVER_RATING());
+            arrayList.get(5).setRating(dbentry.getMUSCLE_ACHE_RATING());
+            arrayList.get(6).setRating(dbentry.getLOSS_OF_TASTE_SMELL_RATING());
+            arrayList.get(7).setRating(dbentry.getCOUGH_RATING());
+            arrayList.get(8).setRating(dbentry.getSHORT_BREATH_RATING());
+            arrayList.get(9).setRating(dbentry.getTIRED_RATING());
+            encryptedDB.insertSymptoms(arrayList,
+                    (float) dbentry.getHEART_RATE(),
+                    dbentry.getSHORT_BREATH_RATING(),
+                    dbentry.getLATITUDE(),dbentry.getLONGITUDE(),
+                    dbentry.getTIMESTAMP()
+            );
+        }*/
+
+        showPrivacyDialog();
+
         /*milliSecond = System.currentTimeMillis();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             uploadImage();

@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.valreja.covidtracker.Symptom;
+import com.valreja.covidtracker.UserManagementHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +30,9 @@ public class DBHelper {
     private void createDB(){
         databaseFile = new File(activity.getFilesDir() + "/user.db");
         //databaseFile.mkdirs();
-        database = SQLiteDatabase.openOrCreateDatabase(databaseFile, "passw", null);
+        database = SQLiteDatabase.openOrCreateDatabase(databaseFile,
+                                                    (new UserManagementHelper((Activity) activity)).getPassword(),
+                                            null);
         createTable();
     }
     private void createTable(){
